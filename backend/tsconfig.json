@@ -7,7 +7,10 @@
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "ESNext",
-    "target": "esnext",
+    "moduleResolution": "bundler", // or "node" - both work for Prisma 7 ESM
+    "target": "ES2023", // Prisma 7 recommends ES2023
+    "esModuleInterop": true, 
+    "allowSyntheticDefaultImports": true, // Optional, but good practice
     "types": [
       "node"
     ],
