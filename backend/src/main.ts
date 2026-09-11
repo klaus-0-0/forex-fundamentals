@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 console.log("TOKEN from env:", process.env.TOKEN);
 app.use(cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173, https://forex-fundamentals-frontend.onrender.com"],
     credentials: true
 }))
 app.use(cookieParser());
