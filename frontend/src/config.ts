@@ -3,6 +3,6 @@ interface appConfig {
 }
 
 const config: appConfig = {
-    apiUrl: ["http://localhost:3000/api"]
+    apiUrl: ["https://forex-fundamentals.onrender.com/api"]
 }
 export default config;
