@@ -4,9 +4,9 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
-    // Add these two lines:
+  provider               = "prisma-client"
+  output                 = "../src/generated/prisma"
+  // Add these two lines:
   generatedFileExtension = "ts"
   importFileExtension    = "js"
 }
@@ -28,14 +28,16 @@ model user {
 }
 
 model Data {
-  id          String  @id @unique @default(uuid())
-  userId      String?
-  topEvents   String[]
-  bullishBias String[]
-  bearishBias String[]
+  id                 String   @id @unique @default(uuid())
+  userId             String?
+  economic_Activites String[]
+  topEvents          String[]
+  bullishBias        String[]
+  bearishBias        String[]
+  button_pressed     Int[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  notes String
-  user  user?  @relation(fields: [userId], references: [id])
+  notes     String
+  user      user?    @relation(fields: [userId], references: [id])
 }

@@ -8,7 +8,7 @@ console.log("token", rough);
 console.log("TOKEN from env:", process.env.TOKEN);
 
 router.post("/data", async (req: Request, res: Response) => {
-    const { email, userId, notes, topData, BullishBias, BearishBias } = req.body;
+    const { email, userId, notes, economic_Activites, topData, BullishBias, BearishBias, button_pressed } = req.body;
 
     try {
         const existingUser = await prisma.user.findUnique({
@@ -24,7 +24,9 @@ router.post("/data", async (req: Request, res: Response) => {
                 topEvents: topData,
                 bullishBias: BullishBias,
                 bearishBias: BearishBias,
-                notes
+                notes,
+                button_pressed,
+                economic_Activites
             }
         })
 

@@ -3,6 +3,7 @@ import config from '../config';
 import { useEffect, useState } from 'react';
 
 function Dashboard() {
+    const [economic_Activites, seteconomic_Activites] = useState(['', '', '', '', '']);
     const [topData, setTopData] = useState(['', '', '', '', '']);
     const [BullishBias, setBullishBias] = useState(['', '', '', '', '']);
     const [BearishBias, setBearishBias] = useState(['', '', '', '', '']);
@@ -10,7 +11,7 @@ function Dashboard() {
 
     const [selectSlot, setSelectSlot] = useState("");
     const [inputVal, setInputVal] = useState("");
-    const [attach_D, setAttack_D] = useState<number[]>([]);
+    const [button_pressed, setButton_pressed] = useState<number[]>([]);
     const [Bar, setBar] = useState<string>("attack");
 
 
@@ -24,7 +25,7 @@ function Dashboard() {
 
     useEffect(() => {
         const count = () => {
-            const length = attach_D.length;
+            const length = button_pressed.length;
 
             if (length < 2) {
                 setBar("attack");
@@ -36,8 +37,20 @@ function Dashboard() {
             }
         }
         count();
-    }, [attach_D])
+        console.log("button_pressed:", button_pressed);
 
+    }, [button_pressed])
+
+    const handle_economic_Activites = () => {
+        economic_Activites.forEach((_, idx) => {
+            if (Number(selectSlot) === idx) {
+                const newData = [...economic_Activites];
+                newData[idx] = inputVal;
+                seteconomic_Activites(newData);
+                setInputVal("");
+            }
+        })
+    }
     const handle_Send = () => {
         topData.forEach((_, idx) => {
             if (Number(selectSlot) === idx) {
@@ -71,7 +84,7 @@ function Dashboard() {
     }
 
     const attack_Defence = (num: number) => {
-        setAttack_D(prev => {
+        setButton_pressed(prev => {
             // Check if this number already exists in the array
             if (prev.includes(num)) {
                 // If exists, remove it (subtract)
@@ -89,11 +102,13 @@ function Dashboard() {
         try {
             const send = await axios.post(`${config.apiUrl}/data`, {
                 notes,
+                economic_Activites,
                 topData,
                 BullishBias,
                 BearishBias,
                 email,
-                userId
+                userId,
+                button_pressed
             })
             if (send) {
                 console.log(send);
@@ -130,7 +145,10 @@ function Dashboard() {
                     const old_Top_data = [...topData];
                     const old_bullishBias_data = [...BullishBias];
                     const old_bearishBias_data = [...BearishBias];
-                    console.log("olddaata: ", old_Top_data);
+                    const old_button_pressed = [...button_pressed];
+                    const old_economic_Activites = [...economic_Activites];
+
+                    // console.log("olddaata: ", old_Top_data);
                     for (let i = 0; i < data.data.topEvents.length; i++) {
                         old_Top_data[i] = data.data.topEvents[i];
                     }
@@ -140,10 +158,18 @@ function Dashboard() {
                     for (let i = 0; i < data.data.bearishBias.length; i++) {
                         old_bearishBias_data[i] = data.data.bearishBias[i];
                     }
+                    for (let i = 0; i < data.data.button_pressed.length; i++) {
+                        old_button_pressed[i] = data.data.button_pressed[i];
+                    }
+                    for (let i = 0; i < data.data.economic_Activites.length; i++) {
+                        old_economic_Activites[i] = data.data.economic_Activites[i];
+                    }
                     setTopData(old_Top_data);
                     setBullishBias(old_bullishBias_data);
                     setBearishBias(old_bearishBias_data);
                     setnotes(data.data.notes);
+                    setButton_pressed(old_button_pressed);
+                    seteconomic_Activites(old_economic_Activites);
                 }
 
             } catch (err) {
@@ -185,7 +211,7 @@ function Dashboard() {
             <div className='flex flex-col items-center mt-10 gap-3'>
                 <p className='text-xl font-bold text-gray-200'>Notes</p>
                 <div className='bg-gray-900 min-h-50 w-2/3 rounded-xl p-4 shadow-2xl'>
-                    <ul className='list-disc list-inside space-y-2 text-lg text-gray-100'>
+                    <ul className='list-disc list-inside space-y-2 text-lg text-gray-200'>
                         {notes.split("\\n").map((line, idx) => (
                             line.trim() && <li key={idx} className=''>{line}</li>
                         ))}
@@ -198,23 +224,62 @@ function Dashboard() {
                 </div>
             </div>
 
+            {/* Current Economic Activities */}
+            <div className='flex flex-col items-center justify-center bg-transparent'>
+                <p className='mt-10 text-3xl font-bold text-gray-400 text-border-black'>USA Economic Activities</p>
+                <div className='w-4/5 min-h-130 h-auto flex flex-col items-center justify-between gap-1 mt-5'>
+                    {economic_Activites.map((val, idx) => (
+                        <div key={idx} className='flex items-start w-full gap-2'>
+                            <p className=' text-gray-200 min-h-10 border-b-2 flex-1 wrap-anywhere whitespace-pre-wrap'>
+                                {val}
+                            </p>
+                        </div>
+                    ))}
+
+                    <div className='flex gap-2'>
+                        <select onChange={(e) => {
+                            const val = e.target.value;
+                            setSelectSlot(val)
+                        }}
+                            className='bg-white rounded-xl'>
+                            {/* <option value={""}>select</option> */}
+                            {[0, 1, 2, 3, 4].map((num) => (
+                                <option key={num} value={num}>{num}</option>
+                            ))}
+                        </select>
+                        <input
+                            value={inputVal}
+                            type='text'
+                            placeholder='write you thoughts here'
+                            onChange={(e) => {
+                                setInputVal(e.target.value)
+                            }}
+                            onKeyDown={(e) => e.key == "Enter" && handle_economic_Activites()}
+                            className='bg-white w-3/2 rounded-xl text-center'>
+                        </input>
+                        <button onClick={() => handle_economic_Activites()} className='p-2 bg-blue-800 rounded-xl cursor-pointer transition-all duration-300 hover:bg-blue-700 hover:scale-105 hover:shadow-lg'>
+                            send</button>
+                    </div>
+                </div>
+            </div>
+
             {/* Top fundamental data */}
             <div className='flex flex-col items-center justify-center bg-transparent'>
-                <p className='mt-10 text-3xl font-bold text-amber-50'>Top Fundamental's</p>
-                <div className='w-4/5 h-130 flex flex-col items-center justify-between gap-1 mt-5'>
+                <p className='mt-10 text-3xl font-bold text-gray-400'>Top Macros & Events</p>
+                <div className='w-4/5 min-h-130 h-auto flex flex-col items-center justify-between gap-1 mt-5'>
                     {topData.map((val, idx) => (
                         <div key={idx} className='flex items-start w-full gap-2'>
-                            <p className=' text-gray-100 min-h-10 border-b-2 flex-1 wrap-anywhere whitespace-pre-wrap'>
+                            <p className=' text-gray-200 min-h-10 border-b-2 flex-1 wrap-anywhere whitespace-pre-wrap'>
                                 {val}
                             </p>
                             <button
                                 onClick={() => attack_Defence(idx + 1)}
                                 className={`relative w-14 h-7 rounded-full transition-colors duration-300 shrink-0 cursor-pointer
-                               ${attach_D.includes(idx + 1) ? 'bg-green-500' : 'bg-gray-500'}`}
+                               ${button_pressed.includes(idx + 1) ? 'bg-green-500' : 'bg-gray-500'}`}
                             >
                                 <span className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full 
                                                   transition-transform duration-300 ease-in-out shadow-md
-                                                ${attach_D.includes(idx + 1) ? 'translate-x-7' : 'translate-x-0'}`}
+                                                ${button_pressed.includes(idx + 1) ? 'translate-x-7' : 'translate-x-0'}`}
                                 />
                             </button>
                         </div>
@@ -264,10 +329,10 @@ function Dashboard() {
             <div className='flex flex-col items-center justify-center mt-4 w-full'>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4 w-4/5'>
                     {/* Bullish */}
-                    <div className='flex flex-col gap-2'>
+                    <div className='flex flex-col gap-2 h-auto'>
                         <h3 className='text-green-400 font-bold text-center'>📈 Bullish-Bias  What_Could_Flip</h3>
                         {BullishBias.map((val, idx) => (
-                            <p key={idx} className='flex-1 rounded-2xl text-gray-100 min-h-20 bg-gray-800 p-2 wrap-break-word whitespace-pre-wrap'>
+                            <p key={idx} className='rounded-2xl text-gray-200 min-h-20 h-auto bg-gray-800 p-2 wrap-break-word whitespace-pre-wrap'>
                                 {val || ""}
                             </p>
                         ))}
@@ -302,7 +367,7 @@ function Dashboard() {
                     <div className='flex flex-col gap-2'>
                         <h3 className='text-red-400 font-bold text-center'>📉 Bearish-Bias What_could_Flip</h3>
                         {BearishBias.map((val, idx) => (
-                            <p key={idx} className='flex-1 rounded-2xl text-gray-100 min-h-20 bg-gray-800 p-2 wrap-break-word whitespace-pre-wrap'>
+                            <p key={idx} className=' rounded-2xl text-gray-200 min-h-20 bg-gray-800 p-2 wrap-break-word whitespace-pre-wrap'>
                                 {val || ""}
                             </p>
                         ))}
