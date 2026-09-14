@@ -1,6 +1,7 @@
 import axios from 'axios';
 import config from '../config';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Dashboard() {
     const [economic_Activites, seteconomic_Activites] = useState(['', '', '', '', '']);
@@ -14,7 +15,7 @@ function Dashboard() {
     const [button_pressed, setButton_pressed] = useState<number[]>([]);
     const [Bar, setBar] = useState<string>("attack");
 
-
+    const navigate = useNavigate();
     const [userData] = useState(() => {
         const stored = localStorage.getItem("userData");
         return stored ? JSON.parse(stored) : null;
@@ -180,31 +181,49 @@ function Dashboard() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    // useEffect(() => {
-    //     console.log("topdata: ", topData);
-
-    // }, [inputVal])
-
+    const handle_logout = ()=>{
+        localStorage.removeItem("userData");
+        navigate("/login");
+    }
 
     return (
         <div className={`min-h-screen ${Bar === "attack" ? 'bg-linear-to-br from-green-700 via-black to-green-900' :
             Bar === "defence" ? 'bg-linear-to-br from-red-800 via-black to-red-900' :
                 Bar === "cautious" ? 'bg-linear-to-br from-purple-700 via-black to-purple-900 ' : ""
             }`}>
-            <nav className={`sticky top-0 z-50 flex items-center gap-x-6 font-bold  text-black text-2xl p-2 border-b-2 border-gray-900 
-                ${Bar === "attack" ? 'bg-linear-to-br from-emerald-800 via-emerald-900 bg-emerald-950 shadow-2xl' :
-                    Bar === "defence" ? 'bg-linear-to-br from-red-900 via-red-900 to-pink-950 shadow-2xl' :
-                        Bar === "cautious" ? 'bg-linear-to-br from-purple-800 via-purple-900 to-purple-950 shadow-2xl' : ""
-                }`}>
+            <nav
+                className={`sticky top-0 z-50 flex items-center justify-between gap-x-6
+    font-bold text-black text-2xl p-2 border-b-2 border-gray-900
+    ${Bar === "attack"
+                        ? "bg-linear-to-br from-emerald-800 via-emerald-900 bg-emerald-950 shadow-2xl"
+                        : Bar === "defence"
+                            ? "bg-linear-to-br from-red-900 via-red-900 to-pink-950 shadow-2xl"
+                            : Bar === "cautious"
+                                ? "bg-linear-to-br from-purple-800 via-purple-900 to-purple-950 shadow-2xl"
+                                : ""
+                    }`}
+            >
                 <span>Forex</span>
-                <button
-                    onClick={() => postData()}
-                    className="ml-auto px-4 py-2 text-sm font-medium text-white  
-                     rounded-lg shadow-md transition-all duration-200 
-                     hover:bg-gray-700 hover:scale-105 active:scale-95 cursor-pointer"
-                >
-                    Save
-                </button>
+
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => postData()}
+                        className="px-4 py-2 text-sm font-medium text-white
+                                   rounded-lg shadow-md transition-all duration-200
+                                 hover:bg-gray-700 hover:scale-105 active:scale-95 cursor-pointer"
+                    >
+                        Save
+                    </button>
+
+                    <button
+                        onClick={() => handle_logout()}
+                        className="px-4 py-2 text-sm font-medium text-white
+                                   rounded-lg shadow-md transition-all duration-200
+                                 hover:bg-gray-700 hover:scale-105 active:scale-95 cursor-pointer"
+                    >
+                        Logout
+                    </button>
+                </div>
             </nav>
 
             {/* Notes */}
