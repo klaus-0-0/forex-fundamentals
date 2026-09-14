@@ -14,9 +14,11 @@ CREATE TABLE "user" (
 CREATE TABLE "Data" (
     "id" TEXT NOT NULL,
     "userId" TEXT,
+    "economic_Activites" TEXT[],
     "topEvents" TEXT[],
     "bullishBias" TEXT[],
     "bearishBias" TEXT[],
+    "button_pressed" INTEGER[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "notes" TEXT NOT NULL,
